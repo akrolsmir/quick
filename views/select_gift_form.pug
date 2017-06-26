@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1 Pick a gift for #{event.recipient.name}!
+  ul
+    for gift in gifts
+      li
+        a(href=gift.event_url): h3 #{gift.name}
+        a(href=gift.event_url): img(src=gift.image_url, href=gift.url, width=100)
+        hr
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg
+

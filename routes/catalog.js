@@ -6,6 +6,16 @@ var book_controller = require('../controllers/bookController');
 var author_controller = require('../controllers/authorController');
 var genre_controller = require('../controllers/genreController');
 var book_instance_controller = require('../controllers/bookinstanceController');
+var event_controller = require('../controllers/eventController');
+
+/// EVENT ROUTES ///
+router.get('/events', event_controller.event_list);
+
+router.get('/event/:id/update/', event_controller.event_update_get);
+
+router.post('/event/:id/update/', event_controller.event_update_post);
+
+router.get('/event/:event_id/gift/:gift_id/create', event_controller.event_create_gift_get);
 
 /// BOOK ROUTES ///
 
