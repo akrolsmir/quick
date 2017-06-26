@@ -20,6 +20,8 @@ mongoose.connect(mongoDB);
 var db = mongoose.connection;
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+var moment = require('moment');
+
 var gifts = {}
 var recipients = {}
 var events = {}
@@ -28,6 +30,7 @@ var categories = {}
 function createCategories() {
   categories.book = new Genre({name: 'Book'});
   categories.board_game = new Genre({name: 'Board Game'});
+  categories.toy = new Genre({name: 'Toy'});
 }
 
 function createGifts() {
@@ -46,46 +49,48 @@ function createGifts() {
     price: 7.18,
     categories: [categories.book],
   });
+
+  gifts.frisbee = new Gift({
+    name: 'Discraft Frisbee',
+    image_url: 'https://images-na.ssl-images-amazon.com/images/I/71cWJ2zWbCL._SL1001_.jpg',
+    amazon_url: 'https://www.amazon.com/gp/product/B0014LZVSK',
+    price: 8.75,
+    categories: [categories.toy],
+  })
 }
 
 function createRecipients() {
-  recipients.alice = new Recipient({
-    name: 'Alice',
-    birth_month: 1,
-    birth_day: 1,
-  });
-
-  recipients.bob = new Recipient({
-    name: 'Bob',
-    birth_month: 1,
-    birth_day: 15,
-  });
+  function create(ref, name, month, day) {
+    recipients[ref] = new Recipient({
+      name: name, birth_month: month, birth_day: day,
+    });
+  }
+  create('lilly', 'Lilly An', 6, 2);
+  create('michael', 'Michael Liu', 6, 3);
+  create('karthik', 'Karthik Vemulapalli', 6, 21);
+  create('shawn', 'Shawn Yifei Xie', 7, 25);
+  create('mom', 'Mom', 8, 10);
+  create('alice', 'Alice Pang', 9, 1);
+  create('will', 'Will Xu', 9, 26);
+  create('david', 'David Liu', 10, 2);
+  create('akhil', 'Akhil Batra', 10, 17);
+  create('alec', 'Alec Mouri', 10, 28);
+  create('normand', 'Normand Overney', 11, 2);
 }
 
 function createEvents() {
-  events.alice2018 = new Event({
-    date: '2018-01-01',
-    name: 'Alice\'s Bday 2018',
-    recipient: recipients.alice,
-    gift: gifts.awkward,
-    reminder: '2017-12-20',
-  });
-
-  events.bob2017 = new Event({
-    date: '2017-09-21',
-    name: 'Bob\'s Graduation',
-    recipient: recipients.bob,
-    gift: gifts.awkward,
-    reminder: '2017-09-01',
-  });
-
-  events.bob2018 = new Event({
-    date: '2019-01-15',
-    name: 'Bob\'s Graduation',
-    recipient: recipients.bob,
-    gift: gifts.scythe,
-    reminder: '2017-01-01',
-  })
+  for (key in recipients) {
+    var r = recipients[key];
+    // JS month is 0-indexed...
+    var bday = new Date(2017, r.birth_month-1, r.birth_day);
+    events[key + '_bday_2017'] = new Event({
+      date: bday,
+      name: r.name + '\'s Bday 2017',
+      recipient: r,
+      reminder: moment(bday).subtract(7, 'days').toDate(),
+      // gift: random(gifts or none),
+    })
+  }
 }
 
 async function save(objects) {
